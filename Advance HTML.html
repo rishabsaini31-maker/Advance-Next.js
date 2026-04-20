@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advance HTML — Interactive Demo</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: rgba(255, 255, 255, 0.06);
+      --surface-hover: rgba(255, 255, 255, 0.1);
+      --border: rgba(255, 255, 255, 0.12);
+      --text: #e8eaed;
+      --muted: #9aa0a6;
+      --accent: #7c9cff;
+      --accent-dim: #5a7fd4;
+      --success: #34d399;
+      --shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+      --radius: 14px;
+      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+      --mono: "SF Mono", "Consolas", monospace;
+    }
+
+    [data-theme="light"] {
+      --bg: #f0f2f5;
+      --surface: rgba(255, 255, 255, 0.85);
+      --surface-hover: #fff;
+      --border: rgba(0, 0, 0, 0.08);
+      --text: #1a1d21;
+      --muted: #5c6370;
+      --accent: #3b5bdb;
+      --accent-dim: #2f4bc4;
+      --shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      transition: background 0.35s ease, color 0.35s ease;
+    }
+
+    .bg-mesh {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% -20%, rgba(124, 156, 255, 0.25), transparent),
+        radial-gradient(ellipse 60% 40% at 100% 0%, rgba(52, 211, 153, 0.12), transparent),
+        var(--bg);
+      pointer-events: none;
+    }
+
+    .wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem 4rem;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .brand p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      padding: 0.55rem 1rem;
+      border-radius: 10px;
+      font-size: 0.875rem;
+      transition: background 0.2s, transform 0.15s, border-color 0.2s;
+    }
+
+    button:hover {
+      background: var(--surface-hover);
+      border-color: var(--accent);
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-dim));
+      border-color: transparent;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.08);
+      border-color: transparent;
+    }
+
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+    }
+
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      padding: 0.35rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    nav a:hover,
+    nav a[aria-current="true"] {
+      color: var(--accent);
+      background: var(--surface);
+    }
+
+    section {
+      margin-bottom: 3rem;
+      scroll-margin-top: 1rem;
+    }
+
+    section h2 {
+      margin: 0 0 1rem;
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    section h2::before {
+      content: "";
+      width: 4px;
+      height: 1.1em;
+      background: linear-gradient(180deg, var(--accent), var(--success));
+      border-radius: 2px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .stat {
+      padding: 1rem;
+      border-radius: 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .stat output {
+      display: block;
+      font-size: 1.75rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--accent);
+    }
+
+    .stat span {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .task-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .task-form input {
+      flex: 1;
+      min-width: 200px;
+      padding: 0.65rem 1rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 1rem;
+    }
+
+    .task-form input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(124, 156, 255, 0.25);
+    }
+
+    #task-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    #task-list li {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.65rem 0;
+      border-bottom: 1px solid var(--border);
+      animation: slideIn 0.35s ease;
+    }
+
+    #task-list li:last-child {
+      border-bottom: none;
+    }
+
+    #task-list li.done label {
+      text-decoration: line-through;
+      color: var(--muted);
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .task-actions {
+      margin-left: auto;
+      display: flex;
+      gap: 0.35rem;
+    }
+
+    .task-actions button {
+      padding: 0.35rem 0.6rem;
+      font-size: 0.75rem;
+    }
+
+    .canvas-wrap {
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    #particle-canvas {
+      display: block;
+      width: 100%;
+      height: 200px;
+      cursor: crosshair;
+    }
+
+    .canvas-hint {
+      position: absolute;
+      bottom: 0.75rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.75rem;
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+      #task-list li {
+        animation: none;
+      }
+      button:active {
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-mesh" aria-hidden="true"></div>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <h1>Advance HTML</h1>
+        <p>Semantic layout · CSS variables &amp; grid · ES modules–style JS</p>
+      </div>
+      <div class="toolbar">
+        <button type="button" id="theme-toggle" aria-pressed="false" title="Toggle light/dark theme">
+          Theme
+        </button>
+        <button type="button" class="btn-primary" id="clear-tasks">Clear done</button>
+      </div>
+    </header>
+
+    <nav aria-label="Page sections">
+      <a href="#overview" aria-current="true">Overview</a>
+      <a href="#tasks">Tasks</a>
+      <a href="#canvas">Canvas</a>
+    </nav>
+
+    <main>
+      <section id="overview" aria-labelledby="overview-heading">
+        <h2 id="overview-heading">Live stats</h2>
+        <div class="card">
+          <div class="grid">
+            <div class="stat">
+              <output id="stat-tasks">0</output>
+              <span>Active tasks</span>
+            </div>
+            <div class="stat">
+              <output id="stat-done">0</output>
+              <span>Completed</span>
+            </div>
+            <div class="stat">
+              <output id="stat-clicks">0</output>
+              <span>Canvas taps</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="tasks" aria-labelledby="tasks-heading">
+        <h2 id="tasks-heading">Task list (localStorage)</h2>
+        <div class="card">
+          <form class="task-form" id="task-form" autocomplete="off">
+            <label for="task-input" class="visually-hidden">New task</label>
+            <input
+              type="text"
+              id="task-input"
+              name="task"
+              placeholder="Add a task and press Enter…"
+              maxlength="200"
+              required
+            />
+            <button type="submit" class="btn-primary">Add</button>
+          </form>
+          <ul id="task-list" role="list" aria-label="Tasks"></ul>
+        </div>
+      </section>
+
+      <section id="canvas" aria-labelledby="canvas-heading">
+        <h2 id="canvas-heading">Particle canvas</h2>
+        <div class="card">
+          <div class="canvas-wrap">
+            <canvas id="particle-canvas" width="900" height="200" aria-label="Interactive particle field"></canvas>
+            <span class="canvas-hint">Click or drag to add ripples</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Advance HTML.html — open in a browser; tasks persist in <code>localStorage</code>.</p>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      const STORAGE_KEY = "advance-html-tasks";
+      const THEME_KEY = "advance-html-theme";
+
+      const els = {
+        themeToggle: document.getElementById("theme-toggle"),
+        clearTasks: document.getElementById("clear-tasks"),
+        taskForm: document.getElementById("task-form"),
+        taskInput: document.getElementById("task-input"),
+        taskList: document.getElementById("task-list"),
+        statTasks: document.getElementById("stat-tasks"),
+        statDone: document.getElementById("stat-done"),
+        statClicks: document.getElementById("stat-clicks"),
+        canvas: document.getElementById("particle-canvas"),
+        navLinks: document.querySelectorAll('nav a[href^="#"]'),
+      };
+
+      let tasks = [];
+      let canvasClicks = 0;
+
+      function loadTheme() {
+        const saved = localStorage.getItem(THEME_KEY);
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const theme = saved || (prefersDark ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", theme === "light" ? "light" : "dark");
+        els.themeToggle.setAttribute("aria-pressed", theme === "light" ? "true" : "false");
+        els.themeToggle.textContent = theme === "light" ? "Dark" : "Light";
+      }
+
+      function toggleTheme() {
+        const next = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", next);
+        localStorage.setItem(THEME_KEY, next);
+        els.themeToggle.setAttribute("aria-pressed", next === "light" ? "true" : "false");
+        els.themeToggle.textContent = next === "light" ? "Dark" : "Light";
+      }
+
+      function loadTasks() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          tasks = raw ? JSON.parse(raw) : [];
+          if (!Array.isArray(tasks)) tasks = [];
+        } catch {
+          tasks = [];
+        }
+      }
+
+      function saveTasks() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+      }
+
+      function uid() {
+        return crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2);
+      }
+
+      function renderTasks() {
+        els.taskList.innerHTML = "";
+        tasks.forEach((t) => {
+          const li = document.createElement("li");
+          li.className = t.done ? "done" : "";
+          li.dataset.id = t.id;
+
+          const cb = document.createElement("input");
+          cb.type = "checkbox";
+          cb.checked = t.done;
+          cb.setAttribute("aria-label", "Mark complete");
+          cb.addEventListener("change", () => {
+            t.done = cb.checked;
+            li.classList.toggle("done", t.done);
+            saveTasks();
+            updateStats();
+          });
+
+          const label = document.createElement("label");
+          label.appendChild(document.createTextNode(t.text));
+
+          const actions = document.createElement("div");
+          actions.className = "task-actions";
+          const del = document.createElement("button");
+          del.type = "button";
+          del.textContent = "Remove";
+          del.addEventListener("click", () => {
+            tasks = tasks.filter((x) => x.id !== t.id);
+            saveTasks();
+            renderTasks();
+            updateStats();
+          });
+          actions.appendChild(del);
+
+          li.appendChild(cb);
+          li.appendChild(label);
+          li.appendChild(actions);
+          els.taskList.appendChild(li);
+        });
+        updateStats();
+      }
+
+      function updateStats() {
+        const active = tasks.filter((t) => !t.done).length;
+        const done = tasks.filter((t) => t.done).length;
+        els.statTasks.textContent = String(active);
+        els.statDone.textContent = String(done);
+        els.statClicks.textContent = String(canvasClicks);
+      }
+
+      els.taskForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const text = els.taskInput.value.trim();
+        if (!text) return;
+        tasks.push({ id: uid(), text, done: false });
+        els.taskInput.value = "";
+        saveTasks();
+        renderTasks();
+      });
+
+      els.clearTasks.addEventListener("click", () => {
+        tasks = tasks.filter((t) => !t.done);
+        saveTasks();
+        renderTasks();
+      });
+
+      els.themeToggle.addEventListener("click", toggleTheme);
+
+      /* Scroll spy for nav */
+      const sections = [...document.querySelectorAll("main section[id]")];
+      function setActiveNav() {
+        const y = window.scrollY + 80;
+        let current = sections[0]?.id;
+        for (const sec of sections) {
+          if (sec.offsetTop <= y) current = sec.id;
+        }
+        els.navLinks.forEach((a) => {
+          const match = a.getAttribute("href") === "#" + current;
+          a.setAttribute("aria-current", match ? "true" : "false");
+        });
+      }
+      window.addEventListener("scroll", setActiveNav, { passive: true });
+      setActiveNav();
+
+      /* Canvas particles */
+      const ctx = els.canvas.getContext("2d");
+      let w = 0;
+      let h = 0;
+      const particles = [];
+      const ripples = [];
+
+      function resizeCanvas() {
+        const rect = els.canvas.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        w = Math.floor(rect.width * dpr);
+        h = Math.floor(rect.height * dpr);
+        els.canvas.width = w;
+        els.canvas.height = h;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const cssW = rect.width;
+        const cssH = rect.height;
+        const count = Math.floor((cssW * cssH) / 9000);
+        particles.length = 0;
+        for (let i = 0; i < count; i++) {
+          particles.push({
+            x: Math.random() * cssW,
+            y: Math.random() * cssH,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: (Math.random() - 0.5) * 0.4,
+            r: 1 + Math.random() * 2,
+          });
+        }
+      }
+
+      function addRipple(cx, cy) {
+        ripples.push({ x: cx, y: cy, r: 0, max: 80 + Math.random() * 40, life: 1 });
+        canvasClicks++;
+        updateStats();
+      }
+
+      let dragging = false;
+      els.canvas.addEventListener("pointerdown", (e) => {
+        dragging = true;
+        const r = els.canvas.getBoundingClientRect();
+        addRipple(e.clientX - r.left, e.clientY - r.top);
+      });
+      els.canvas.addEventListener("pointermove", (e) => {
+        if (!dragging) return;
+        const r = els.canvas.getBoundingClientRect();
+        if (Math.random() > 0.85) addRipple(e.clientX - r.left, e.clientY - r.top);
+      });
+      window.addEventListener("pointerup", () => {
+        dragging = false;
+      });
+
+      function tick() {
+        const rect = els.canvas.getBoundingClientRect();
+        const cssW = rect.width;
+        const cssH = rect.height;
+
+        const isDark = document.documentElement.getAttribute("data-theme") !== "light";
+        const fill = isDark ? "rgba(124, 156, 255, 0.35)" : "rgba(59, 91, 219, 0.4)";
+        const line = isDark ? "rgba(52, 211, 153, 0.12)" : "rgba(52, 211, 153, 0.18)";
+
+        ctx.clearRect(0, 0, cssW, cssH);
+        ctx.fillStyle = isDark ? "rgba(15, 20, 25, 0.5)" : "rgba(240, 242, 245, 0.4)";
+        ctx.fillRect(0, 0, cssW, cssH);
+
+        for (const p of particles) {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x < 0 || p.x > cssW) p.vx *= -1;
+          if (p.y < 0 || p.y > cssH) p.vy *= -1;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = fill;
+          ctx.fill();
+        }
+
+        for (let i = ripples.length - 1; i >= 0; i--) {
+          const rp = ripples[i];
+          rp.r += 2.5;
+          rp.life -= 0.012;
+          if (rp.r > rp.max || rp.life <= 0) {
+            ripples.splice(i, 1);
+            continue;
+          }
+          ctx.beginPath();
+          ctx.arc(rp.x, rp.y, rp.r, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(124, 156, 255, ${0.4 * rp.life})`;
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const a = particles[i];
+            const b = particles[j];
+            const dx = a.x - b.x;
+            const dy = a.y - b.y;
+            const d = Math.hypot(dx, dy);
+            if (d < 90) {
+              ctx.beginPath();
+              ctx.moveTo(a.x, a.y);
+              ctx.lineTo(b.x, b.y);
+              ctx.strokeStyle = line;
+              ctx.lineWidth = (1 - d / 90) * 0.8;
+              ctx.stroke();
+            }
+          }
+        }
+
+        requestAnimationFrame(tick);
+      }
+
+      window.addEventListener("resize", () => {
+        resizeCanvas();
+      });
+
+      loadTheme();
+      loadTasks();
+      renderTasks();
+      resizeCanvas();
+      requestAnimationFrame(tick);
+    })();
+  </script>
+</body>
+</html>
